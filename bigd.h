@@ -450,6 +450,9 @@ int bdShortIsEqual(BIGD a, bdigit_t d);
  */
 bdigit_t bdToShort(BIGD b);
 
+int bdIsNegative(BIGD b);
+
+int bdChs(BIGD b);
 
 /***********************/
 /* BIT-WISE OPERATIONS */
@@ -579,7 +582,7 @@ size_t bdConvToHex(BIGD b, char *s, size_t smax);
 @param[in] s Null-terminated string of decimal digits `[0-9]`
 @returns Number of significant digits actually set, which could be 0.
 */
-size_t bdConvFromDecimal(BIGD b, const char *s);
+size_t bdConvFromDecimal(BIGD b, const char *s, size_t n);
 
 /** Convert BIGD object into a string of decimal characters
 @param[in] b BIGD object to be converted

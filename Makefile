@@ -6,13 +6,17 @@
 
 OBJECTS= bigd.o bigdigits.o bigdigitsRand.o bigdRand.o
 INCLUDES= bigd.h bigdigits.h bigdtypes.h bigdRand.h bigdigitsRand.h
-CFLAGS= -std=c99 -pedantic -Wall -Wpointer-arith -Wstrict-prototypes -Wno-format -O2
+CFLAGS= -std=c99 -pedantic -Wall -Wpointer-arith -Wstrict-prototypes -Wno-format -O2 -fPIC
 CC= gcc
 
 %.o: %.c $(INCLUDES)
 	$(CC) $(CFLAGS) -c $<
-	
-# bigd "bd" tests
+
+libbigd.a:  $(INCLUDES) $(OBJECTS)
+	ar -rcs $@ $(OBJECTS)
+
+libbigd.so: $(INCLUDES) $(OBJECTS)
+	$(CC) -shared -o $@ $(OBJECTS) $(LDFLAGS)
 
 t_bdTest: t_bdTest.o $(INCLUDES) $(OBJECTS)
 	$(CC) $(CFLAGS) -o $@ $@.o $(OBJECTS) $(LDFLAGS)
@@ -71,4 +75,4 @@ t_bdCPP: t_bdCPP.o $(INCLUDES) $(OBJECTS)
 	g++ $(CFLAGS) -o $@ $@.o $(OBJECTS) $(LDFLAGS)
 
 clean:
-	-rm -f *.o
+	-rm -f *.o *.a *.so

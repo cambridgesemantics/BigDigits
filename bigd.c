@@ -285,16 +285,16 @@ size_t bdConvToHex(T b, char *s, size_t smax)
 	return mpConvToHex(b->digits, b->ndigits, s, smax);
 }
 
-size_t bdConvFromDecimal(BIGD b, const char *s)
+size_t bdConvFromDecimal(BIGD b, const char *s, size_t nchars)
 {
 	size_t ndigits, n;
 
 	assert(b);
 	/* approx size but never too small */
-	ndigits = (strlen(s) / 2 + OCTETS_PER_DIGIT) / OCTETS_PER_DIGIT;
+	ndigits = (nchars / 2 + OCTETS_PER_DIGIT) / OCTETS_PER_DIGIT;
 	bd_resize(b, ndigits);
 
-	n = mpConvFromDecimal(b->digits, ndigits, s);
+	n = mpConvFromDecimal(b->digits, ndigits, s, nchars);
 	b->ndigits = n;
 
 	return n;
@@ -323,6 +323,17 @@ bdigit_t bdToShort(T b)
 	return mpToShort(b->digits, b->ndigits);
 }
 
+int bdIsNegative(T b)
+{
+	assert(b);
+	return mpIsNegative(b->digits, b->ndigits);
+}
+
+int bdChs(T b)
+{
+	assert(b);
+	return mpChs(b->digits, b->digits, b->ndigits);
+}
 
 size_t bdBitLength(T b)
 	/* Returns base-1 index to most significant bit in b */

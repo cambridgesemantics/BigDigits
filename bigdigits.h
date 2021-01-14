@@ -453,7 +453,7 @@ size_t mpConvFromOctets(DIGIT_T a[], size_t ndigits, const unsigned char *c, siz
 size_t mpConvToOctets(const DIGIT_T a[], size_t ndigits, unsigned char *c, size_t nbytes);
 /** Converts a string in decimal format to a big digit.
 @returns actual number of (possibly zero) digits set. */
-size_t mpConvFromDecimal(DIGIT_T a[], size_t ndigits, const char *s);
+size_t mpConvFromDecimal(DIGIT_T a[], size_t ndigits, const char *s, size_t n);
 /** Converts big digit a into a string in decimal format, where s has size smax including the terminating zero.
 @returns number of chars required excluding leading zeroes. */
 size_t mpConvToDecimal(const DIGIT_T a[], size_t ndigits, char *s, size_t smax);

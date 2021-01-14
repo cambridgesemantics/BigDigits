@@ -1737,6 +1737,9 @@ size_t mpConvFromOctets(DIGIT_T a[], size_t ndigits, const unsigned char *c, siz
 	DIGIT_T t;
 
 	mpSetZero(a, ndigits);
+	if (nbytes == 0) {
+		return 0;
+	}
 
 	/* Read in octets, least significant first */
 	/* i counts into big_d, j along c, and k is # bits to shift */
@@ -1746,6 +1749,16 @@ size_t mpConvFromOctets(DIGIT_T a[], size_t ndigits, const unsigned char *c, siz
 		for (k = 0; j >= 0 && k < BITS_PER_DIGIT; j--, k += 8)
 			t |= ((DIGIT_T)c[j]) << k;
 		a[i] = t;
+	}
+	if (c[0] & 0x80) {
+		// negative.  sign extend.  is there an easier way to do this?
+		if (a[ndigits - 1] <= 0x000000FF) {
+			a[ndigits - 1] = 0xFFFFFF00 | a[ndigits - 1];
+		} else if (a[ndigits - 1] <= 0x0000FFFF) {
+			a[ndigits - 1] = 0xFFFF0000 | a[ndigits - 1];
+		} else if (a[ndigits - 1] <= 0x00FFFFFF) {
+			a[ndigits - 1] = 0xFF000000 | a[ndigits - 1];
+		}
 	}
 
 	return i;
@@ -1906,7 +1919,7 @@ size_t mpConvToHex(const DIGIT_T a[], size_t ndigits, char *s, size_t smax)
 	return conv_to_base(a, ndigits, s, smax, 16);
 }
 
-size_t mpConvFromDecimal(DIGIT_T a[], size_t ndigits, const char *s)
+size_t mpConvFromDecimal(DIGIT_T a[], size_t ndigits, const char *s, size_t n)
 /* Convert a string in decimal format to a big digit.
    Return actual number of digits set (may be larger than mpSizeof).
    Just ignores invalid characters in s.
@@ -1918,7 +1931,6 @@ size_t mpConvFromDecimal(DIGIT_T a[], size_t ndigits, const char *s)
 	uint8_t *newdigits;
 #endif
 	size_t newlen;
-	size_t n;
 	unsigned long t;
 	size_t i, j;
 	const int base = 10;
@@ -1926,13 +1938,12 @@ size_t mpConvFromDecimal(DIGIT_T a[], size_t ndigits, const char *s)
 	mpSetZero(a, ndigits);
 
 	/* Create some temp storage for int values */
-	n = strlen(s);
 	if (0 == n) return 0;
 	newlen = uiceil(n * 0.41524);	/* log(10)/log(256)=0.41524 */
 	ALLOC_BYTES(newdigits, newlen);
 
 	/* Work through zero-terminated string */
-	for (i = 0; s[i]; i++)
+	for (i = 0; (i < n) && s[i]; i++)
 	{
 		t = s[i] - '0';
 		if (t > 9 || t < 0) continue;
@@ -3061,7 +3072,7 @@ done:
 /**	Computes y = x^e mod m in constant time using Coron's algorithm */
 int mpModExp_ct(DIGIT_T yout[], const DIGIT_T x[], const DIGIT_T e[], DIGIT_T m[], size_t ndigits)
 {	
-	/* Algorithm: Coron’s exponentiation (left-to-right)
+	/* Algorithm: Coronâ€™s exponentiation (left-to-right)
 	 * Square-and-multiply resistant against simple power attacks (SPA)
 	 * Ref: Jean-Sebastian Coron, "Resistance Against Differential Power Analysis for 
 	 * Elliptic Curve Cryptosystems", August 1999.
